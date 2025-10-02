@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserHandler struct {
@@ -22,7 +23,7 @@ func NewUserHandelr(userRepo repositories.UserRepository) *UserHandler {
 func (uh *UserHandler) CreateUserHandler(ctx *gin.Context) {
 	var req struct {
 		Username string `json:"username"`
-		Age      int    `json:"age"`
+		Password string `json:"password_hash"`
 		Email    string `json:"email"`
 	}
 
@@ -31,15 +32,22 @@ func (uh *UserHandler) CreateUserHandler(ctx *gin.Context) {
 		return
 	}
 
-	if req.Username == "" || req.Email == "" {
+	if req.Username == "" || req.Password == "" || req.Email == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "required"})
+		return
+	}
+
+	hashpassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
 	}
 
 	user := entities.User{
 		Username:  req.Username,
-		Age:       req.Age,
 		Email:     req.Email,
+		Password:  string(hashpassword),
 		CreatedAt: time.Now(),
 	}
 

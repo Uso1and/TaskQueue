@@ -16,7 +16,7 @@ func NewUserRepo(db *sql.DB) repositories.UserRepository {
 }
 
 func (ur *PostUserRepo) CreateUserRepo(ctx context.Context, user *entities.User) error {
-	query := `INSERT INTO users(username, age, email, created_at) VALUES ($1, $2, $3, $4) RETURNING id`
+	query := `INSERT INTO users (email, username, password_hash, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id`
 
-	return ur.db.QueryRowContext(ctx, query, user.Username, user.Age, user.Email, user.CreatedAt).Scan(&user.ID)
+	return ur.db.QueryRowContext(ctx, query, user.Email, user.Username, user.Password, user.CreatedAt, user.UpdatedAt).Scan(&user.ID)
 }
