@@ -5,6 +5,8 @@ import (
 	"taskqueue/internal/domain/entities"
 )
 
-type SuperUserRepository interface {
-	CreateSuperUserRepo(ctx context.Context, user *entities.SyperUser) error
+type UserRepository interface {
+	Create(ctx context.Context, user *entities.User) error
+	FindByEmail(ctx context.Context, email string) (*entities.User, error)
+	FindByUserID(ctx context.Context, id int) (*entities.User, error)
 }

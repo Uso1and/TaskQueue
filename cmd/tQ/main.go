@@ -9,16 +9,17 @@ import (
 func main() {
 
 	if err := postgresql.InitDB(); err != nil {
-		log.Printf("Failed to initialize database: %v", err)
+		log.Fatalf("Failed to initialize database: %v", err)
 	}
 
 	if err := postgresql.RunMigrations(postgresql.DB); err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to run migrations: %v", err)
 	}
 
-	r := routes.SetupRouter()
+	router := routes.SetupRouter()
 
-	if err := r.Run(":8080"); err != nil {
-		log.Fatal(err)
+	log.Println("Server starting on :8080")
+	if err := router.Run(":8080"); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }
