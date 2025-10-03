@@ -9,13 +9,12 @@ import (
 
 func SetupRouter() *gin.Engine {
 
-	userRepo := postgresql.NewUserRepo(postgresql.DB)
+	userRepo := postgresql.NewSuperUserRepo(postgresql.DB)
 
-	userHandler := handlers.NewUserHandelr(userRepo)
+	superUserHandler := handlers.NewSuperUserHandelr(userRepo)
 
 	r := gin.Default()
 
-	r.POST("/cruser", userHandler.CreateUserHandler)
-
+	r.POST("/sucrt", superUserHandler.CreateSuperUserHandler)
 	return r
 }

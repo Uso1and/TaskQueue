@@ -1,65 +1,65 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"taskqueue/internal/domain/entities"
 	"taskqueue/internal/domain/repositories"
-
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserHandler struct {
-	userRepo repositories.UserRepository
+type SyperUserHandler struct {
+	userRepo repositories.SuperUserRepository
 }
 
-func NewUserHandelr(userRepo repositories.UserRepository) *UserHandler {
-	return &UserHandler{userRepo: userRepo}
+func NewSuperUserHandelr(userRepo repositories.SuperUserRepository) *SyperUserHandler {
+	return &SyperUserHandler{userRepo: userRepo}
 }
 
-func (uh *UserHandler) CreateUserHandler(ctx *gin.Context) {
-	var req struct {
-		Username string `json:"username"`
-		Password string `json:"password_hash"`
-		Email    string `json:"email"`
+func (suh *SyperUserHandler) CreateSuperUserHandler(ctx *gin.Context) {
+	var required struct {
+		Username   string `json:"username"`
+		Surname    string `json:"surname"`
+		Patronymic string `json:"patronymic"`
+		Password   string `json:"password"`
+		Email      string `json:"email"`
+		Role       string `json:"role"`
 	}
-
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&required); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
 
-	if req.Username == "" || req.Password == "" || req.Email == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "required"})
+	if required.Username == "" || required.Surname == "" || required.Patronymic == "" ||
+		required.Password == "" || required.Email == "" || required.Role == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "missing fields"})
 		return
 	}
 
-	hashpassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-
+	hashpassword, err := bcrypt.GenerateFromPassword([]byte(required.Password), bcrypt.DefaultCost)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "server error"})
 		return
 	}
 
-	user := entities.User{
-		Username:  req.Username,
-		Email:     req.Email,
-		Password:  string(hashpassword),
-		CreatedAt: time.Now(),
+	su := entities.SyperUser{
+		Username:   required.Username,
+		Surname:    required.Surname,
+		Patronymic: required.Patronymic,
+		Password:   string(hashpassword),
+		Email:      required.Email,
+		Role:       required.Role,
+		// created_at/updated_at даст БД по DEFAULT
 	}
 
-	if err := uh.userRepo.CreateUserRepo(ctx.Request.Context(), &user); err != nil {
-		log.Printf("error create user: %v", err)
-
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Create user"})
+	if err := suh.userRepo.CreateSuperUserRepo(ctx.Request.Context(), &su); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "User succesfully create",
-		"user":    user,
+	ctx.JSON(http.StatusCreated, gin.H{
+		"message": "superUser created",
+		"id":      su.ID,
 	})
 }

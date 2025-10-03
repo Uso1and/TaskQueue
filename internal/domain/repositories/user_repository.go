@@ -5,6 +5,6 @@ import (
 	"taskqueue/internal/domain/entities"
 )
 
-type UserRepository interface {
-	CreateUserRepo(ctx context.Context, user *entities.User) error
+type SuperUserRepository interface {
+	CreateSuperUserRepo(ctx context.Context, user *entities.SyperUser) error
 }
