@@ -10,11 +10,8 @@ import (
 )
 
 func SetupRouter() *gin.Engine {
-
 	userRepo := postgresql.NewUserRepository(postgresql.DB)
-
 	userApp := handlers.NewUserApp(userRepo)
-
 	userHTTPHandler := httpHandlers.NewUserHTTPHandler(userApp)
 
 	gin.SetMode(gin.ReleaseMode)
@@ -22,11 +19,10 @@ func SetupRouter() *gin.Engine {
 
 	v1 := r.Group("/api/v1")
 	{
-
-		users := v1.Group("/users") //UserCreate
+		users := v1.Group("/users")
 		{
-
 			users.POST("", middleware.RequireSuper(), userHTTPHandler.CreateUser)
+			users.GET("", middleware.RequireSuper(), userHTTPHandler.GetAllUsers) // НОВЫЙ ЭНДПОИНТ
 		}
 	}
 

@@ -65,3 +65,40 @@ func (r *UserRepository) FindByUserID(ctx context.Context, id int) (*entities.Us
 
 	return user, err
 }
+
+func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
+
+	const q = `
+	SELECT id, username, surname, patronymic, password, email, role, created_at, updated_at
+	FROM users ORDER BY created_at DESC`
+
+	rows, err := r.db.QueryContext(ctx, q)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var users []*entities.User
+
+	for rows.Next() {
+
+		user := &entities.User{}
+
+		err := rows.Scan(
+			&user.ID, &user.Username, &user.Surname, &user.Patronymic, &user.Password,
+			&user.Email, &user.Role, &user.CreatedAt, &user.UpdatedAt,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return users, err
+}

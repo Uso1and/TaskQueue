@@ -146,12 +146,31 @@ func (cli *CLI) createUserPrompt() {
 }
 
 func (cli *CLI) listUsers() {
-	fmt.Println("=== Список пользователей ===")
-	fmt.Println("Функция в разработке - нужно добавить метод GetAllUsers в UserApp")
-	fmt.Println("Для полной реализации потребуется:")
-	fmt.Println("1. Добавить метод GetAll в UserRepository")
-	fmt.Println("2. Добавить GetAllUsers в UserApp")
-	fmt.Println("3. Реализовать отображение списка здесь")
+	fmt.Println("=== Список всех пользователей ===")
+
+	users, err := cli.userApp.GetAllUsers(context.Background())
+	if err != nil {
+		fmt.Printf("Ошибка при получении пользователей: %v\n", err)
+		return
+	}
+
+	if len(users) == 0 {
+		fmt.Println("Пользователи не найдены")
+		return
+	}
+
+	fmt.Printf("Найдено пользователей: %d\n\n", len(users))
+
+	for i, user := range users {
+		fmt.Printf("%d. %s %s %s\n", i+1, user.Surname, user.Username, user.Patronymic)
+		fmt.Printf("   Email: %s\n", user.Email)
+		fmt.Printf("   Роль: %s\n", user.Role)
+		fmt.Printf("   Создан: %s\n", user.CreatedAt.Format("2006-01-02 15:04:05"))
+		fmt.Println("   " + strings.Repeat("-", 50))
+	}
+
+	fmt.Print("\nНажмите Enter для продолжения...")
+	bufio.NewReader(os.Stdin).ReadBytes('\n')
 }
 
 func (cli *CLI) mediumUserMenu() {
