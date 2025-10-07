@@ -4,10 +4,12 @@ go 1.25.0
 
 require (
 	github.com/gin-gonic/gin v1.11.0
+	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	github.com/pressly/goose/v3 v3.25.0
 	golang.org/x/crypto v0.40.0
+	golang.org/x/term v0.33.0
 )
 
 require (

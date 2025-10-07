@@ -26,6 +26,5 @@ func (app *UserApp) CreateUserBySuper(ctx context.Context, username, surname, pa
 		Role:       role,
 	}
 
-	// ИСПРАВЛЕНИЕ: Handler -> Handle
 	return app.CreateUser.Handle(ctx, cmd)
 }
