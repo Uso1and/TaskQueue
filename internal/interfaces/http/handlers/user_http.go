@@ -7,7 +7,6 @@ import (
 	"taskqueue/internal/domain/entities"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserHTTPHandler struct {
@@ -30,21 +29,13 @@ func (h *UserHTTPHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to hash password",
-		})
-		return
-	}
-
 	userID, err := h.userApp.CreateUserBySuper(
 		c.Request.Context(),
 		req.Username,
 		req.Surname,
 		req.Patronymic,
 		req.Email,
-		string(hashedPassword),
+		req.Password,
 		req.Role,
 	)
 
